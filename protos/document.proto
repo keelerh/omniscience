@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package omniscience;
+
+import "google/protobuf/timestamp.proto";
+
+enum Service {
+    GDRIVE = 0;
+    JIRA = 1;
+    CONFLUENCE = 2;
+    GITHUB = 3;
+}
+
+message Document {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    Service service = 4;
+    repeated string words = 5;
+    string url = 6;
+    google.protobuf.Timestamp modified_time = 7;
+}

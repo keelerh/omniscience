@@ -1,0 +1,2 @@
+# omniscience
+Search Everything
