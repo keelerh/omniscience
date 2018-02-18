@@ -4,16 +4,18 @@ import (
 	"bufio"
 	"context"
 	"net/http"
-	"strings"
-
 	pb "github.com/keelerh/omniscience/protos"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/api/drive/v3"
+	"strings"
+	"fmt"
 )
 
 type GoogleDriveService struct {
 	svc *drive.Service
 }
+
+const GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
 
 func New(client *http.Client) (*GoogleDriveService, error) {
 	svc, err := drive.New(client)
@@ -42,13 +44,14 @@ func (g *GoogleDriveService) GetAll(ctx context.Context, in *pb.GetAllDocumentsR
 			}, err
 		}
 		for _, f := range r.Files {
-			// Only attempt to download text files
-			if !strings.HasPrefix(f.MimeType, "text") {
+			// Only attempt to download text files and gdocs
+			isGoogleDoc := isGoogleDoc(f.MimeType)
+			if !(isTextMime(f.MimeType) || isGoogleDoc) {
 				continue
 			}
-			words, err := downloadFile(g.svc, f.Id)
+			words, err := downloadFile(g.svc, f.Id, isGoogleDoc)
 			if err != nil {
-				log.Warningf("Unable to download file: FileId(%v)", f.Id)
+				log.Warningf("Unable to download file: FileId(%v) %v", f.Id, err)
 			}
 			// TODO: Only retrieve files modified after the last modified time specified in the request.
 			doc := pb.Document{
@@ -56,9 +59,12 @@ func (g *GoogleDriveService) GetAll(ctx context.Context, in *pb.GetAllDocumentsR
 				Name:        f.Name,
 				Description: f.Description,
 				Service:     pb.Service_GDRIVE,
-				Url:         f.WebViewLink,
+				Url:         GoogleDriveWebViewLink + f.Id,
 				Words:       words,
 			}
+			fmt.Println(f.Id)
+			fmt.Println(f.Name)
+			fmt.Println(doc)
 			docs = append(docs, &doc)
 		}
 		pageToken = r.NextPageToken
@@ -72,8 +78,14 @@ func (g *GoogleDriveService) GetAll(ctx context.Context, in *pb.GetAllDocumentsR
 	}, nil
 }
 
-func downloadFile(svc *drive.Service, fileId string) ([]string, error) {
-	resp, err := svc.Files.Get(fileId).Download()
+func downloadFile(svc *drive.Service, fileId string, isGoogleDoc bool) ([]string, error) {
+	var resp *http.Response
+	var err error
+	if isGoogleDoc {
+		resp, err = svc.Files.Export(fileId, "text/plain").Download()
+	} else {
+		resp, err = svc.Files.Get(fileId).Download()
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -91,4 +103,12 @@ func downloadFile(svc *drive.Service, fileId string) ([]string, error) {
 	}
 
 	return words, nil
+}
+
+func isTextMime(mimeType string) bool {
+	return strings.HasPrefix("text", mimeType)
+}
+
+func isGoogleDoc(mimeType string) bool {
+	return mimeType == "application/vnd.google-apps.document"
 }
