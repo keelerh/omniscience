@@ -56,6 +56,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
+	// TODO: This should use a service account rather than involving user authorization.
 	client := getClient(ctx, config)
 
 	googleDriveService, err := gdrive.New(client)
