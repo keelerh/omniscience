@@ -38,8 +38,8 @@ func main() {
 
 	ingestionClient := pb.NewIngestionClient(conn)
 	_, err = ingestionClient.Index(context.Background(), &pb.IndexDocumentServiceRequest{
-		Service:          pb.DocumentService_GDRIVE,
-		LastModifiedTime: modifiedSince,
+		Service:      pb.DocumentService_GDRIVE,
+		LastModified: modifiedSince,
 	})
 	if err != nil {
 		log.Fatalf("Failed to index documents for Google Drive: %v", err)

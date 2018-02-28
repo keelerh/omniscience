@@ -19,7 +19,7 @@ message Document {
     DocumentService service = 4;
     string content = 5;
     string url = 6;
-    google.protobuf.Timestamp last_modified_time = 7;
+    google.protobuf.Timestamp last_modified = 7;
 }
 
 message DocumentId {

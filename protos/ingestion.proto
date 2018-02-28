@@ -13,5 +13,5 @@ service Ingestion {
 
 message IndexDocumentServiceRequest {
     DocumentService service = 1;
-    google.protobuf.Timestamp last_modified_time = 2;
+    google.protobuf.Timestamp last_modified = 2;
 }
