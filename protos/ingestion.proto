@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package omniscience;
+
+import "document.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service Ingestion {
+    // Indexes documents and uploads them to persistant storage.
+    rpc Index (IndexDocumentServiceRequest) returns (google.protobuf.Empty) {}
+}
+
+message IndexDocumentServiceRequest {
+    DocumentService service = 1;
+    google.protobuf.Timestamp last_modified_time = 2;
+}
