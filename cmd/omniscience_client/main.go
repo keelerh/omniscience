@@ -19,10 +19,9 @@ const (
 func main() {
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("Did not connect: %v", err)
+		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer conn.Close()
-	c := pb.NewGoogleDriveClient(conn)
 
 	timestamp := defaultModifiedSinceTimestamp
 	if len(os.Args) > 1 {
@@ -36,11 +35,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to parse modified since timestamp as proto: %v", err)
 	}
-	r, err := c.GetAll(context.Background(), &pb.GetAllDocumentsRequest{
-		ModifiedSince: modifiedSince,
+
+	ingestionClient := pb.NewIngestionClient(conn)
+	_, err = ingestionClient.Index(context.Background(), &pb.IndexDocumentServiceRequest{
+		Service:          pb.DocumentService_GDRIVE,
+		LastModifiedTime: modifiedSince,
 	})
 	if err != nil {
-		log.Fatalf("Failed to get all documents: %v", err)
+		log.Fatalf("Failed to index documents for Google Drive: %v", err)
 	}
-	log.Printf("Documents: %s", r.Documents)
 }

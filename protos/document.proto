@@ -4,19 +4,24 @@ package omniscience;
 
 import "google/protobuf/timestamp.proto";
 
-enum Service {
-    GDRIVE = 0;
-    JIRA = 1;
-    CONFLUENCE = 2;
-    GITHUB = 3;
+enum DocumentService {
+    ALL = 0;
+    GDRIVE = 1;
+    JIRA = 2;
+    CONFLUENCE = 3;
+    GITHUB = 4;
 }
 
 message Document {
-    string id = 1;
+    DocumentId id = 1;
     string name = 2;
     string description = 3;
-    Service service = 4;
-    repeated string words = 5;
+    DocumentService service = 4;
+    string content = 5;
     string url = 6;
-    google.protobuf.Timestamp modified_time = 7;
+    google.protobuf.Timestamp last_modified_time = 7;
+}
+
+message DocumentId {
+    string id = 1;
 }

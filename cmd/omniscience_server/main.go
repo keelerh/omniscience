@@ -16,13 +16,13 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/keelerh/omniscience/pkg/gdrive"
+	"github.com/keelerh/omniscience/pkg/document_services"
+	"github.com/keelerh/omniscience/pkg/ingestion"
 	pb "github.com/keelerh/omniscience/protos"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 const (
@@ -59,14 +59,17 @@ func main() {
 	// TODO: This should use a service account rather than involving user authorization.
 	client := getClient(ctx, config)
 
-	googleDriveService, err := gdrive.New(client)
+	googleDriveService, err := document_services.NewGoogleDrive(client)
 	if err != nil {
 		log.Fatalf("Failed to instantiate Google Drive service: %v", err)
 	}
 	pb.RegisterGoogleDriveServer(s, googleDriveService)
 
-	// Register reflection service on gRPC server
-	reflection.Register(s)
+	ingestionService, err := ingestion.NewIngestionService()
+	if err != nil {
+		log.Fatalf("Failed to instantiate Ingestion service: %v", err)
+	}
+	pb.RegisterIngestionServer(s, ingestionService)
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
