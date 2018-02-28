@@ -51,12 +51,15 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 			}
 			// TODO: Only retrieve files modified after the last modified time specified in the request.
 			doc := pb.Document{
-				Id:          &pb.DocumentId{Id: f.Id},
-				Name:        f.Name,
-				Description: f.Description,
-				Service:     pb.DocumentService_GDRIVE,
-				Url:         GoogleDriveWebViewLink + f.Id,
-				Content:     content,
+				Id:           &pb.DocumentId{Id: f.Id},
+				Name:         f.Name,
+				Description:  f.Description,
+				Service:      pb.DocumentService_GDRIVE,
+				Content:      content,
+				Url:          GoogleDriveWebViewLink + f.Id,
+				// TODO: This should be using the ModifiedTIme of the file returned by Google but that
+				// field currently appears to be null.
+				LastModified: request.ModifiedSince,
 			}
 			if err := stream.Send(&doc); err != nil {
 				return err
