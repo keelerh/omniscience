@@ -7,7 +7,7 @@
 // Language tag table generator.
 // Data read from the web.
 
-package main
+package language
 
 import (
 	"bufio"

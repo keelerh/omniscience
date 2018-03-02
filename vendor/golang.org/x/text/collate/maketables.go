@@ -7,7 +7,7 @@
 // Collation table generator.
 // Data read from the web.
 
-package main
+package collate
 
 import (
 	"archive/zip"

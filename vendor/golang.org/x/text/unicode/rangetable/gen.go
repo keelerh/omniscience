@@ -4,7 +4,7 @@
 
 // +build ignore
 
-package main
+package rangetable
 
 import (
 	"bytes"

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	pb "github.com/keelerh/omniscience/protos"
-	"github.com/olivere/elastic"
+	"github.com/keelerh/omniscience/server/vendor/github.com/olivere/elastic"
 )
 
 // Document is a structure used for serializing/deserializing data in Elasticsearch.

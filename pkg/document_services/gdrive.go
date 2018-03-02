@@ -3,8 +3,8 @@ package document_services
 import (
 	"net/http"
 	pb "github.com/keelerh/omniscience/protos"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/api/drive/v3"
+	log "github.com/keelerh/omniscience/server/vendor/github.com/sirupsen/logrus"
+	"github.com/keelerh/omniscience/server/vendor/google.golang.org/api/drive/v3"
 	"strings"
 	"io/ioutil"
 )
