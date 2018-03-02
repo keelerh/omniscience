@@ -19,10 +19,10 @@ import (
 	"github.com/keelerh/omniscience/pkg/document_services"
 	"github.com/keelerh/omniscience/pkg/ingestion"
 	pb "github.com/keelerh/omniscience/protos"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/drive/v3"
-	"google.golang.org/grpc"
+	"github.com/keelerh/omniscience/server/vendor/golang.org/x/oauth2"
+	"github.com/keelerh/omniscience/server/vendor/golang.org/x/oauth2/google"
+	"github.com/keelerh/omniscience/server/vendor/google.golang.org/api/drive/v3"
+	"github.com/keelerh/omniscience/server/vendor/google.golang.org/grpc"
 )
 
 const (

@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang/protobuf/ptypes"
-	pb_google_empty "github.com/golang/protobuf/ptypes/empty"
+	"github.com/keelerh/omniscience/server/vendor/github.com/golang/protobuf/ptypes"
+	pb_google_empty "github.com/keelerh/omniscience/server/vendor/github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/keelerh/omniscience/protos"
-	"github.com/olivere/elastic"
-	"google.golang.org/grpc"
+	"github.com/keelerh/omniscience/server/vendor/github.com/olivere/elastic"
+	"github.com/keelerh/omniscience/server/vendor/google.golang.org/grpc"
 )
 
 const (

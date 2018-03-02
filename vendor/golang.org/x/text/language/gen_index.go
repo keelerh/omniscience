@@ -4,7 +4,7 @@
 
 // +build ignore
 
-package main
+package language
 
 // This file generates derivative tables based on the language package itself.
 

@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
+	"github.com/keelerh/omniscience/server/vendor/github.com/golang/protobuf/ptypes"
 	pb "github.com/keelerh/omniscience/protos"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
+	"github.com/keelerh/omniscience/server/vendor/golang.org/x/net/context"
+	"github.com/keelerh/omniscience/server/vendor/google.golang.org/grpc"
 )
 
 const (
