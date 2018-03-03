@@ -111,6 +111,7 @@ func (s *IngestionService) indexDocument(ctx context.Context, d *pb.Document) er
 			description = description[:defaultDescriptionLengthInChars]
 		}
 	}
+	fmt.Println(d.Url)
 	doc := Document{
 		Id:           id,
 		Title:        d.Title,
