@@ -12,7 +12,7 @@ $ brew install elasticsearch
 
 ### Using local ES server
 
-To avoid getting a cors related error when connecting the UI to your local elasticsearch instance, add the following to your `config/elasticsearch.yml` file (if installed using brew, this is found at `/usr/local/Cellar/elasticsearch/6.2.2/libexec/config/elasticsearch.yml`).
+To avoid getting a cors related error when connecting the UI to your local elasticsearch instance, add the following to your `config/elasticsearch.yml` file (if you installed Elasticsearch using brew, this file can be found at `/usr/local/Cellar/elasticsearch/6.2.2/libexec/config/elasticsearch.yml`).
 
 ```
 http.cors.enabled : true  
@@ -33,11 +33,11 @@ $ elasticsearch
 
 1. Go to [cloud.google.com/console](cloud.google.com/console)
 2. Click Create Project
-3. Enter a project name and click create
+3. Enter a project name and click Create
 4. Once you have created your project, click on the options menu in the top left of the page, then 'API Manager', then 'Credentials'. Click on 'New credentials' and then 'Service account key'
 5. Click on the 'hamburger' menu icon (next to "Google Cloud Platform" in the top left of the page), then 'API Manager', then 'Credentials'
 6. Click on 'New credentials', then 'Service account key'
-7. Next, select 'New service account', name it anything and select 'Project' and then 'Viewer' as the role from the dropdown list, finally select JSON as the key type and click 'Create'. Upon clicking 'Create', a JSO file will be downloaded; this is important for later so remember where you downloaded it
+7. Next, select 'New service account', name it anything and select 'Project' and then 'Viewer' as the role from the dropdown list, finally select JSON as the key type and click 'Create'. Upon clicking 'Create', a JSON file will be downloaded; this is important for later so remember where you downloaded it
 8. Take note of the `client_email`
 8. Click on 'Manage service accounts' (on the right-hand side), then select your new Service Account, click on the three dots beside, and select Edit
 9. Tick the box "Enable GSuite Domain-wide Delegation" and click Configure consent screen
@@ -56,10 +56,10 @@ For the Google service account to have access to index your files you must share
 From the project root run:
 
 ```
-$ go run cmd/omniscience_server/main.go
+$ go run cmd/omniscience_server/main.go --fGoogleServiceAccountPath=<path-to-service-account-json>
 ```
 
-### Invoke indexing
+### Manually invoke indexing
 
 ```
 $ go run cmd/omniscience_client/main.go
@@ -85,4 +85,4 @@ $ cd client && npm start
 
 ## Search everything!
 
-Navigate to [localhost:3000](localhost:3000)
+Navigate to [http://localhost:3000](http://localhost:3000)
