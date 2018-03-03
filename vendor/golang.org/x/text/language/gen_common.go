@@ -4,7 +4,7 @@
 
 // +build ignore
 
-package language
+package main
 
 // This file contains code common to the maketables.go and the package code.
 

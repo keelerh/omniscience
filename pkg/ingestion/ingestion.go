@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/keelerh/omniscience/server/vendor/github.com/golang/protobuf/ptypes"
-	pb_google_empty "github.com/keelerh/omniscience/server/vendor/github.com/golang/protobuf/ptypes/empty"
+	"github.com/golang/protobuf/ptypes"
+	pb_google_empty "github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/keelerh/omniscience/protos"
-	"github.com/keelerh/omniscience/server/vendor/github.com/olivere/elastic"
-	"github.com/keelerh/omniscience/server/vendor/google.golang.org/grpc"
+	"google.golang.org/grpc"
+	"github.com/olivere/elastic"
+	"io"
 )
 
 const (
@@ -21,21 +22,14 @@ type IngestionService struct {
 	gdriveClient  pb.GoogleDriveClient
 }
 
-func NewIngestionService() (*IngestionService, error) {
-	// Obtain a client and connect to the default Elasticsearch installation
-	// on 127.0.0.1:9200.
-	elasticClient, err := elastic.NewClient()
-	if err != nil {
-		return nil, err
-	}
-
+func NewIngestionService(esClient *elastic.Client) (*IngestionService, error) {
 	cc, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 
 	return &IngestionService{
-		elasticClient: elasticClient,
+		elasticClient: esClient,
 		gdriveClient:  pb.NewGoogleDriveClient(cc),
 	}, nil
 }
@@ -47,11 +41,16 @@ func (s *IngestionService) Index(ctx context.Context, request *pb.IndexDocumentS
 			ModifiedSince: request.LastModified,
 		})
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("Failed to get all documents for Google Drive: %v", err))
+			return nil, errors.New(fmt.Sprintf("failed to get documents for Google Drive: %v", err))
 		}
-		resp, err := stream.Recv()
-		if err := s.index(ctx, resp); err != nil {
-			return nil, err
+		for {
+			doc, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err := s.index(ctx, doc); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -124,6 +123,6 @@ func (s *IngestionService) indexDocument(ctx context.Context, d *pb.Document) er
 		return err
 	}
 
-	fmt.Printf("Indexed document %s to index %s, type %s\n", put.Id, put.Index, put.Type)
+	fmt.Printf("Indexed document %s to index %s, type %s\n", doc.Name, put.Index, put.Type)
 	return nil
 }
