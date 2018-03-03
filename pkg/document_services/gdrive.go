@@ -1,35 +1,45 @@
 package document_services
 
 import (
-	"net/http"
-	pb "github.com/keelerh/omniscience/protos"
-	log "github.com/keelerh/omniscience/server/vendor/github.com/sirupsen/logrus"
-	"github.com/keelerh/omniscience/server/vendor/google.golang.org/api/drive/v3"
-	"strings"
 	"io/ioutil"
+	"net/http"
+	"strings"
+
+	pb "github.com/keelerh/omniscience/protos"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/api/drive/v3"
+	"golang.org/x/oauth2/jwt"
+	"context"
+	"fmt"
+	"time"
 )
 
 type GoogleDriveService struct {
-	svc *drive.Service
+	cfg *jwt.Config
 }
 
 const GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
 
-func NewGoogleDrive(client *http.Client) (*GoogleDriveService, error) {
-	svc, err := drive.New(client)
-	if err != nil {
-		return nil, err
-	}
-
+func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
 	return &GoogleDriveService{
-		svc: svc,
-	}, nil
+		cfg: srvAccountCfg,
+	}
 }
 
 func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream pb.GoogleDrive_GetAllServer) error {
+	ctx, cancelFn := context.WithTimeout(context.Background(), 2 * time.Minute)
+	defer cancelFn()
+
+	fmt.Println(g.cfg.Scopes)
+
+	svc, err := drive.New(g.cfg.Client(ctx))
+	if err != nil {
+		return err
+	}
+
 	pageToken := ""
 	for {
-		q := g.svc.Files.List()
+		q := svc.Files.List()
 		// If we have a pageToken set, apply it to the query
 		if pageToken != "" {
 			q = q.PageToken(pageToken)
@@ -44,24 +54,25 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 			if !(isTextMime(f.MimeType) || isGoogleDoc) {
 				continue
 			}
-			content, err := downloadFile(g.svc, f.Id, isGoogleDoc)
+			content, err := downloadFile(svc, f.Id, isGoogleDoc)
 			if err != nil {
-				log.Warningf("Unable to download file: FileId(%v) %v", f.Id, err)
+				log.Warningf("unable to download file: FileId(%v) %v", f.Id, err)
 				continue
 			}
 			// TODO: Only retrieve files modified after the last modified time specified in the request.
 			doc := pb.Document{
-				Id:           &pb.DocumentId{Id: f.Id},
-				Name:         f.Name,
-				Description:  f.Description,
-				Service:      pb.DocumentService_GDRIVE,
-				Content:      content,
-				Url:          GoogleDriveWebViewLink + f.Id,
-				// TODO: This should be using the ModifiedTIme of the file returned by Google but that
-				// field currently appears to be null.
+				Id:          &pb.DocumentId{Id: f.Id},
+				Name:        f.Name,
+				Description: f.Description,
+				Service:     pb.DocumentService_GDRIVE,
+				Content:     content,
+				Url:         GoogleDriveWebViewLink + f.Id,
+				// TODO: This should be using the ModifiedTIme of the file returned by Google.
+				// but that field currently appears to be null.
 				LastModified: request.ModifiedSince,
 			}
 			if err := stream.Send(&doc); err != nil {
+				fmt.Println("streaming file...", f.Name)
 				return err
 			}
 		}

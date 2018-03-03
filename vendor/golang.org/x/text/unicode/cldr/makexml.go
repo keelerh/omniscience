@@ -5,7 +5,7 @@
 // +build ignore
 
 // This tool generates types for the various XML formats of CLDR.
-package cldr
+package main
 
 import (
 	"archive/zip"
