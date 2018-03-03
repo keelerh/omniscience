@@ -25,7 +25,7 @@ const (
 var (
 	fGoogleServiceAccountPath = flag.String(
 		"google_service_account_path",
-		"/Users/keeley/google_service_account.json",
+		"google_service_account.json",
 		"The path to the Google Drive service account JSON file.")
 )
 

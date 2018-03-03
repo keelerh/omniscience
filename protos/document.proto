@@ -14,7 +14,7 @@ enum DocumentService {
 
 message Document {
     DocumentId id = 1;
-    string name = 2;
+    string title = 2;
     string description = 3;
     DocumentService service = 4;
     string content = 5;

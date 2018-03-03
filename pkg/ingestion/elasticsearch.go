@@ -9,30 +9,32 @@ const (
 				"number_of_replicas": 0
 			},
 			"mappings":{
-				"document":{
+				"_doc":{
 					"properties":{
 						"id":{
 							"type":"keyword"
 						},
-						"name":{
-							"type":"text"
+						"title":{
+							"type":"text",
+							"store": true
 						},
 						"description":{
-							"type":"text"
+							"type":"text",
+							"store": true
 						},
 						"service":{
 							"type":"text"
 						},
 						"content":{
-							"type":"text",
-							"store": true,
-							"fielddata": true
-						},
-						"url":{
 							"type":"text"
 						},
+						"url":{
+							"type":"text",
+							"store": true
+						},
 						"last_modified":{
-							"type":"date"
+							"type":"date",
+							"store": true
 						},
 						"suggest_field":{
 							"type":"completion"

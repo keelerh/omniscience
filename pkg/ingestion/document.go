@@ -10,7 +10,7 @@ import (
 // Document is a structure used for serializing/deserializing data in Elasticsearch.
 type Document struct {
 	Id           string                `json:"id"`
-	Name         string                `json:"name,omitempty"`
+	Title        string                `json:"title,omitempty"`
 	Description  string                `json:"description,omitempty"`
 	Service      pb.DocumentService    `json:"image,omitempty"`
 	Content      string                `json:"created,omitempty"`
