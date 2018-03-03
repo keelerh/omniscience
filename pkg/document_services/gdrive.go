@@ -1,24 +1,22 @@
 package document_services
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
 	pb "github.com/keelerh/omniscience/protos"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/api/drive/v3"
 	"golang.org/x/oauth2/jwt"
-	"context"
-	"fmt"
-	"time"
+	"google.golang.org/api/drive/v3"
 )
+
+const GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
 
 type GoogleDriveService struct {
 	cfg *jwt.Config
 }
-
-const GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
 
 func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
 	return &GoogleDriveService{
@@ -27,12 +25,7 @@ func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
 }
 
 func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream pb.GoogleDrive_GetAllServer) error {
-	ctx, cancelFn := context.WithTimeout(context.Background(), 2 * time.Minute)
-	defer cancelFn()
-
-	fmt.Println(g.cfg.Scopes)
-
-	svc, err := drive.New(g.cfg.Client(ctx))
+	svc, err := drive.New(g.cfg.Client(context.Background()))
 	if err != nil {
 		return err
 	}
@@ -62,7 +55,7 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 			// TODO: Only retrieve files modified after the last modified time specified in the request.
 			doc := pb.Document{
 				Id:          &pb.DocumentId{Id: f.Id},
-				Name:        f.Name,
+				Title:       f.Name,
 				Description: f.Description,
 				Service:     pb.DocumentService_GDRIVE,
 				Content:     content,
@@ -72,7 +65,6 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 				LastModified: request.ModifiedSince,
 			}
 			if err := stream.Send(&doc); err != nil {
-				fmt.Println("streaming file...", f.Name)
 				return err
 			}
 		}

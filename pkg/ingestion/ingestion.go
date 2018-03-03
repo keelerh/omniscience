@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/golang/protobuf/ptypes"
 	pb_google_empty "github.com/golang/protobuf/ptypes/empty"
 	pb "github.com/keelerh/omniscience/protos"
-	"google.golang.org/grpc"
 	"github.com/olivere/elastic"
-	"io"
+	"google.golang.org/grpc"
 )
 
 const (
 	address = "localhost:50051"
+	defaultDescriptionLengthInChars = 120
 )
 
 type IngestionService struct {
@@ -103,10 +104,17 @@ func (s *IngestionService) indexDocument(ctx context.Context, d *pb.Document) er
 	if err != nil {
 		return err
 	}
+	description := d.Description
+	if description == "" {
+		description = d.Content
+		if len(description) > defaultDescriptionLengthInChars {
+			description = description[:defaultDescriptionLengthInChars]
+		}
+	}
 	doc := Document{
 		Id:           id,
-		Name:         d.Name,
-		Description:  d.Description,
+		Title:        d.Title,
+		Description:  description,
 		Service:      d.Service,
 		Content:      d.Content,
 		Url:          d.Url,
@@ -115,7 +123,7 @@ func (s *IngestionService) indexDocument(ctx context.Context, d *pb.Document) er
 
 	put, err := s.elasticClient.Index().
 		Index(index).
-		Type("document").
+		Type("_doc").
 		Id(id).
 		BodyJson(doc).
 		Do(ctx)
@@ -123,6 +131,6 @@ func (s *IngestionService) indexDocument(ctx context.Context, d *pb.Document) er
 		return err
 	}
 
-	fmt.Printf("Indexed document %s to index %s, type %s\n", doc.Name, put.Index, put.Type)
+	fmt.Printf("Indexed document %s with ID %s to index %s\n", doc.Title, put.Id, put.Index)
 	return nil
 }

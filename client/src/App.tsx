@@ -25,13 +25,13 @@ const searchkit = new SearchkitManager(elasticsearchHost);
 const HitItem = (props: HitItemProps) => (
     <div className={props.bemBlocks.item().mix(props.bemBlocks.container('item'))}>
         <div
-            className={props.bemBlocks.item('name')}
+            className={props.bemBlocks.item('title')}
             dangerouslySetInnerHTML={{__html: get(
-                    props.result, 'highlight.name', false) || props.result._source.name}}
+                    props.result, 'highlight.title', false) || props.result._source.name}}
         />
         <div>
             <small
-                className={props.bemBlocks.item('highlights')}
+                className={props.bemBlocks.item('description')}
                 dangerouslySetInnerHTML={{__html: get(props.result, 'highlight.description', '')}}
             />
         </div>
@@ -43,7 +43,7 @@ const App: React.SFC<any> = () => (
         <Layout>
             <TopBar>
                 <SearchBox
-                    autofocus={true}
+                    autofocus={false}
                     searchOnChange={false}
                     queryOptions={{analyzer: 'standard'}}
                     queryFields={['name', 'description', 'content']}
@@ -61,13 +61,13 @@ const App: React.SFC<any> = () => (
                     <Hits
                         mod="sk-hits-list"
                         hitsPerPage={10}
-                        highlightFields={['name', 'description', 'content']}
-                        sourceFilter={['name', 'description', 'content']}
+                        highlightFields={['title', 'description']}
+                        sourceFilter={['title', 'description']}
                         itemComponent={HitItem}
                     />
                     <NoHits
                         mod="sk-hits-list"
-                        suggestionsField={'name'}
+                        suggestionsField={'title'}
                     />
                 </LayoutResults>
             </LayoutBody>
