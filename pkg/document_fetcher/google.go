@@ -1,18 +1,26 @@
-package document_services
+package document_fetcher
 
 import (
 	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	pb "github.com/keelerh/omniscience/protos"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2/jwt"
+	"google.golang.org/grpc"
 	"google.golang.org/api/drive/v3"
+	"sync"
 )
 
-const GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
+const (
+	address                = "localhost:50051"
+	GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
+	service                = "google"
+)
 
 type GoogleDriveService struct {
 	cfg *jwt.Config
@@ -24,11 +32,25 @@ func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
 	}
 }
 
-func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream pb.GoogleDrive_GetAllServer) error {
+func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
+	modifiedSinceProto, err := ptypes.TimestampProto(modifiedSince)
+	if err != nil {
+		log.Fatalf("unable to parse modified since timestamp as proto: %v", err)
+	}
+
 	svc, err := drive.New(g.cfg.Client(context.Background()))
 	if err != nil {
 		return err
 	}
+
+	cc, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("failed to connect: %v", err)
+	}
+	defer cc.Close()
+
+	client := pb.NewIngesterClient(cc)
+	stream, err := client.Ingest(context.Background())
 
 	pageToken := ""
 	for {
@@ -41,6 +63,7 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 		if err != nil {
 			return err
 		}
+		var wg sync.WaitGroup
 		for _, f := range r.Files {
 			// Only attempt to download text files and gdocs
 			isGoogleDoc := isGoogleDoc(f.MimeType)
@@ -57,14 +80,15 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 				Id:          &pb.DocumentId{Id: f.Id},
 				Title:       f.Name,
 				Description: f.Description,
-				Service:     pb.DocumentService_GDRIVE,
+				Service:     service,
 				Content:     content,
 				Url:         GoogleDriveWebViewLink + f.Id,
 				// TODO: This should be using the ModifiedTIme of the file returned by Google.
 				// but that field currently appears to be null.
-				LastModified: request.ModifiedSince,
+				LastModified: modifiedSinceProto,
 			}
 			if err := stream.Send(&doc); err != nil {
+				wg.Add(1)
 				return err
 			}
 		}
@@ -73,6 +97,8 @@ func (g *GoogleDriveService) GetAll(request *pb.GetAllDocumentsRequest, stream p
 			break
 		}
 	}
+
+	stream.CloseSend()
 
 	return nil
 }

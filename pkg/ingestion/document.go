@@ -3,7 +3,6 @@ package ingestion
 import (
 	"time"
 
-	pb "github.com/keelerh/omniscience/protos"
 	"github.com/olivere/elastic"
 )
 
@@ -12,7 +11,7 @@ type Document struct {
 	Id           string                `json:"id"`
 	Title        string                `json:"title,omitempty"`
 	Description  string                `json:"description,omitempty"`
-	Service      pb.DocumentService    `json:"image,omitempty"`
+	Service      string                `json:"image,omitempty"`
 	Content      string                `json:"created,omitempty"`
 	Url          string                `json:"created,omitempty"`
 	LastModified time.Time             `json:"created,omitempty"`
