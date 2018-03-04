@@ -1,8 +1,8 @@
-package ingestion
+package elasticsearch
 
 const (
-	index   = "omniscience"
-	mapping = `
+	Index   = "omniscience"
+	Mapping = `
 		{
 			"settings":{
 				"number_of_shards": 1,
@@ -24,6 +24,7 @@ const (
 						},
 						"service":{
 							"type":"text"
+							"store": true
 						},
 						"content":{
 							"type":"text"
