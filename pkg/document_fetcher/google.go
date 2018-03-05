@@ -2,6 +2,7 @@ package document_fetcher
 
 import (
 	"context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/grpc"
 	"google.golang.org/api/drive/v3"
-	"sync"
 )
 
 const (
@@ -55,7 +55,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 	pageToken := ""
 	for {
 		q := svc.Files.List()
-		// If we have a pageToken set, apply it to the query
+		// If we have a pageToken set, apply it to the query.
 		if pageToken != "" {
 			q = q.PageToken(pageToken)
 		}
@@ -63,9 +63,8 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 		if err != nil {
 			return err
 		}
-		var wg sync.WaitGroup
 		for _, f := range r.Files {
-			// Only attempt to download text files and gdocs
+			// Only attempt to download text files and gdocs.
 			isGoogleDoc := isGoogleDoc(f.MimeType)
 			if !(isTextMime(f.MimeType) || isGoogleDoc) {
 				continue
@@ -88,7 +87,6 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 				LastModified: modifiedSinceProto,
 			}
 			if err := stream.Send(&doc); err != nil {
-				wg.Add(1)
 				return err
 			}
 		}
@@ -98,7 +96,12 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 		}
 	}
 
-	stream.CloseSend()
+	if _, err := stream.CloseAndRecv(); err != nil {
+		// We expect io.EOF once the stream has closed.
+		if err != io.EOF {
+			return err
+		}
+	}
 
 	return nil
 }
