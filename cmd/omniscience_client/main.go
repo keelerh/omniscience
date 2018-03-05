@@ -20,9 +20,9 @@ const (
 )
 
 var (
-	fGoogleServiceAccountPath = flag.String(
-		"google_service_account_path",
-		"/Users/keeley/google_service_account.json",
+	fGoogleServiceAccountFilePath = flag.String(
+		"google_service_account_file_path",
+		"google_service_account.json",
 		"The path to the Google Drive service account JSON file.")
 )
 
@@ -36,11 +36,11 @@ func main() {
 		log.Fatalf("unable to parse modified since timestamp: %v", err)
 	}
 
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	cc, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
-	defer conn.Close()
+	defer cc.Close()
 
 	cfg, err := readGoogleServiceAccountCfg()
 	if err != nil {
@@ -54,7 +54,7 @@ func main() {
 }
 
 func readGoogleServiceAccountCfg() (*jwt.Config, error) {
-	dat, err := ioutil.ReadFile(*fGoogleServiceAccountPath)
+	dat, err := ioutil.ReadFile(*fGoogleServiceAccountFilePath)
 	if err != nil {
 		return nil, err
 	}
