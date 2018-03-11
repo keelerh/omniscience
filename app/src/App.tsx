@@ -1,6 +1,7 @@
 import * as React from 'react';
 import './App.css';
 import './theme.css';
+import 'semantic-ui-css/semantic.min.css';
 import {
     ActionBar,
     ActionBarRow,
@@ -16,28 +17,27 @@ import {
     SearchkitProvider,
     TopBar,
 } from 'searchkit';
-import { get } from 'lodash';
 
 // Set ES url - use a protected URL that only allows read actions.
 const elasticsearchHost = 'http://localhost:9200';
 const searchkit = new SearchkitManager(elasticsearchHost);
 
 const HitItem = (props: HitItemProps) => {
-    const {result, bemBlocks} = props;
+    const { result } = props;
     return (
-        <div className={bemBlocks.item().mix(bemBlocks.container('item'))}>
-            {console.log(result._source)}
-            <div
-                className={bemBlocks.item('title')}
-                dangerouslySetInnerHTML={{__html: get(
-                        result, 'highlight.title', '') || result._source.title}}
-            />
-            <div>
-                <small
-                    className={bemBlocks.item('description')}
-                    dangerouslySetInnerHTML={{__html: get(result, 'highlight.description', '')}}
-                />
-            </div>
+        <div className="ui link items">
+            <a className="item" href={result._source.url}>
+                <div className="ui tiny image">
+                    <img src="/images/gdrive.png"/>
+                </div>
+                <div className="content">
+                    <div className="header">{result._source.title}</div>
+                    <div className="description">
+                        <p>{result._source.description}</p>
+                    </div>
+                    <div className="extra">{result._source.url}</div>
+                </div>
+            </a>
         </div>);
 };
 
@@ -49,8 +49,8 @@ const App: React.SFC<{}> = () => (
                     autofocus={true}
                     searchOnChange={false}
                     queryOptions={{analyzer: 'standard'}}
-                    queryFields={['name', 'description', 'content', 'url']}
-                    prefixQueryFields={['name', 'description', 'content', 'url']}
+                    queryFields={['name', 'description', 'content']}
+                    prefixQueryFields={['name', 'description', 'content']}
                     translations={{'NoHits.DidYouMean': 'Search for {suggestion}'}}
                 />
             </TopBar>
@@ -64,7 +64,6 @@ const App: React.SFC<{}> = () => (
                     <Hits
                         mod="sk-hits-list"
                         hitsPerPage={15}
-                        highlightFields={['title', 'description', 'url']}
                         sourceFilter={['title', 'description', 'url']}
                         itemComponent={HitItem}
                     />
