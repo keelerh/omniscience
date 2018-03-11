@@ -22,13 +22,18 @@ import {
 const elasticsearchHost = 'http://localhost:9200';
 const searchkit = new SearchkitManager(elasticsearchHost);
 
+const services = new Map([
+    ['google', '/images/gdrive.png'],
+    ['confluence', '/images/confluence.png'],
+]);
+
 const HitItem = (props: HitItemProps) => {
     const { result } = props;
     return (
         <div className="ui link items">
             <a className="item" href={result._source.url}>
                 <div className="ui tiny image">
-                    <img src="/images/gdrive.png"/>
+                    <img src={services.get(result._source.service)}/>
                 </div>
                 <div className="content">
                     <div className="header">{result._source.title}</div>
@@ -51,7 +56,6 @@ const App: React.SFC<{}> = () => (
                     queryOptions={{analyzer: 'standard'}}
                     queryFields={['name', 'description', 'content']}
                     prefixQueryFields={['name', 'description', 'content']}
-                    translations={{'NoHits.DidYouMean': 'Search for {suggestion}'}}
                 />
             </TopBar>
             <LayoutBody>
@@ -62,14 +66,11 @@ const App: React.SFC<{}> = () => (
                         </ActionBarRow>
                     </ActionBar>
                     <Hits
-                        mod="sk-hits-list"
                         hitsPerPage={15}
-                        sourceFilter={['title', 'description', 'url']}
+                        sourceFilter={['title', 'description', 'url', 'service']}
                         itemComponent={HitItem}
                     />
-                    <NoHits
-                        suggestionsField={'title'}
-                    />
+                    <NoHits/>
                 </LayoutResults>
             </LayoutBody>
         </Layout>
