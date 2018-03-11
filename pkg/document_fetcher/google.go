@@ -64,6 +64,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 			return err
 		}
 		for _, f := range r.Files {
+			// TODO: Figure out how to download all formats of text files.
 			// Only attempt to download text files and gdocs.
 			isGoogleDoc := isGoogleDoc(f.MimeType)
 			if !(isTextMime(f.MimeType) || isGoogleDoc) {
@@ -82,7 +83,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 				Service:     service,
 				Content:     content,
 				Url:         GoogleDriveWebViewLink + f.Id,
-				// TODO: This should be using the ModifiedTIme of the file returned by Google.
+				// TODO: This should be using the ModifiedTime of the file returned by Google.
 				// but that field currently appears to be null.
 				LastModified: modifiedSinceProto,
 			}
