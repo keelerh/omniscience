@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultDescriptionLengthInChars = 120
+	defaultDescriptionLengthInChars = 400
 )
 
 type Ingester struct {

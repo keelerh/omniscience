@@ -6,7 +6,8 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts-ts": "2.13.0",
-    "searchkit": "^2.3.0"
+    "searchkit": "^2.3.0",
+    "semantic-ui-css": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts-ts start",
