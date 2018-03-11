@@ -11,9 +11,9 @@ type Document struct {
 	Id           string                `json:"id"`
 	Title        string                `json:"title,omitempty"`
 	Description  string                `json:"description,omitempty"`
-	Service      string                `json:"image,omitempty"`
-	Content      string                `json:"created,omitempty"`
-	Url          string                `json:"created,omitempty"`
-	LastModified time.Time             `json:"created,omitempty"`
+	Service      string                `json:"service,omitempty"`
+	Content      string                `json:"content,omitempty"`
+	Url          string                `json:"url,omitempty"`
+	LastModified time.Time             `json:"last_modified,omitempty"`
 	Suggest      *elastic.SuggestField `json:"suggest_field,omitempty"`
 }
