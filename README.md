@@ -31,7 +31,7 @@ $ elasticsearch
 
 ### Create a Google service account
 
-1. Go to [https://cloud.google.com/console](cloud.google.com/console)
+1. Go to [cloud.google.com/console](http://cloud.google.com/console)
 2. Click Create Project
 3. Enter a project name and click Create
 4. Once you have created your project, click on the options menu in the top left of the page, then 'API Manager', then 'Credentials'. Click on 'New credentials' and then 'Service account key'
