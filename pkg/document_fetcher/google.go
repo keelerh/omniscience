@@ -14,6 +14,7 @@ import (
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/grpc"
 	"google.golang.org/api/drive/v3"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -35,17 +36,17 @@ func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
 func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 	modifiedSinceProto, err := ptypes.TimestampProto(modifiedSince)
 	if err != nil {
-		log.Fatalf("unable to parse modified since timestamp as proto: %v", err)
+		return errors.Wrap(err, "failed to parse modified since timestamp as proto")
 	}
 
 	svc, err := drive.New(g.cfg.Client(context.Background()))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to instantiate new Google Drive service from config")
 	}
 
 	cc, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
+		return errors.Wrap(err, "failed to connect to IngestionService")
 	}
 	defer cc.Close()
 
