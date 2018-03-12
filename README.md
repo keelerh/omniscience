@@ -34,16 +34,13 @@ $ elasticsearch
 1. Go to [cloud.google.com/console](http://cloud.google.com/console)
 2. Click Create Project
 3. Enter a project name and click Create
-4. Once you have created your project, click on the options menu in the top left of the page, then 'API Manager', then 'Credentials'. Click on 'New credentials' and then 'Service account key'
-5. Click on the 'hamburger' menu icon (next to "Google Cloud Platform" in the top left of the page), then 'API Manager', then 'Credentials'
-6. Click on 'New credentials', then 'Service account key'
-7. Next, select 'New service account', name it anything and select 'Project' and then 'Viewer' as the role from the dropdown list, finally select JSON as the key type and click 'Create'. Upon clicking 'Create', a JSON file will be downloaded; this is important for later so remember where you downloaded it
-8. Take note of the `client_email`
-8. Click on 'Manage service accounts' (on the right-hand side), then select your new Service Account, click on the three dots beside, and select Edit
-9. Tick the box "Enable GSuite Domain-wide Delegation" and click Configure consent screen
-10. Add a Project name (it can be anything) and click Save
-11. Click on the three-lines icon again, choose 'API Manager' and in the 'Overview'
-12. Click on the Drive API and then click the blue Enable button
+4. Once you have created your project, click on the options menu icon in the top left corner of the page, then 'APIs & Services', then 'Credentials'
+5. Click on 'Create credentials' and then 'Service account key'
+6. Next, select 'New service account', name it anything and select 'Project' and then 'Viewer' as the role from the dropdown list, finally select JSON as the key type and click 'Create'. Upon clicking 'Create', a JSON file will be downloaded; this is important for later so remember where you downloaded it
+7. Click on 'Manage service accounts' (on the right-hand side), select your new Service Account, click on the three dots on the right-hand side, and then select Edit
+8. Tick the box "Enable GSuite Domain-wide Delegation" and click Configure consent screen
+9. Click on the options menu icon in the top left corner again, choose 'APIs & Services' and then 'Dashboard'
+10. Click on the Drive API and then click the blue Enable button
 
 ### Share folders with Google service account
 
