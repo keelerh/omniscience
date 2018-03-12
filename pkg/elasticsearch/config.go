@@ -23,7 +23,7 @@ const (
 							"store": true
 						},
 						"service":{
-							"type":"text"
+							"type":"text",
 							"store": true
 						},
 						"content":{
