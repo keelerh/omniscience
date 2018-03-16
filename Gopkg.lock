@@ -22,6 +22,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/jaytaylor/html2text"
+  packages = ["."]
+  revision = "190166da35878a77103b951ae035a473531c1fc2"
+
+[[projects]]
+  branch = "master"
   name = "github.com/mailru/easyjson"
   packages = [
     ".",
@@ -30,6 +36,18 @@
     "jwriter"
   ]
   revision = "32fa128f234d041f196a9f3e0fea5ac9772c08e1"
+
+[[projects]]
+  name = "github.com/mattn/go-runewidth"
+  packages = ["."]
+  revision = "9e777a8366cce605130a531d2cd6363d07ad7317"
+  version = "v0.0.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/olekukonko/tablewriter"
+  packages = ["."]
+  revision = "b8a9be070da40449e501c3c4730a889e42d87a9e"
 
 [[projects]]
   name = "github.com/olivere/elastic"
@@ -55,6 +73,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/ssor/bom"
+  packages = ["."]
+  revision = "6386211fdfcf24c0bfbdaceafd02849ed9a8a509"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   revision = "650f4a345ab4e5b245a3034b110ebc7299e68186"
@@ -65,6 +89,8 @@
   packages = [
     "context",
     "context/ctxhttp",
+    "html",
+    "html/atom",
     "http2",
     "http2/hpack",
     "idna",
@@ -183,6 +209,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5accac941ea134174ef9bd00f7d1163be322a428cf82e299d94e4220ebded8f9"
+  inputs-digest = "712a93b455fbb7ec40c173289b0eb856b641f4a4bdb97d43214c6bba4efc5f3b"
   solver-name = "gps-cdcl"
   solver-version = 1
