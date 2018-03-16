@@ -90,7 +90,7 @@ func (s *Ingester) indexDocument(ctx context.Context, d *pb.Document) error {
 	if description == "" {
 		description = d.Content
 		if len(description) > defaultDescriptionLengthInChars {
-			description = description[:defaultDescriptionLengthInChars]
+			description = description[:defaultDescriptionLengthInChars] + "..."
 		}
 	}
 	doc := Document{

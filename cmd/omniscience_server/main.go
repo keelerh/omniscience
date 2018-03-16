@@ -31,7 +31,7 @@ func main() {
 
 	ingester, err := ingestion.NewIngester(esClient)
 	if err != nil {
-		log.Fatalf("failed to instantiate Ingester service: %v", err)
+		log.Fatalf("failed to initialise Ingestion service: %v", err)
 	}
 	pb.RegisterIngesterServer(s, ingester)
 

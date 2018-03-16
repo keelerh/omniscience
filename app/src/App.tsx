@@ -24,7 +24,7 @@ const elasticsearchHost = 'http://localhost:9200';
 const searchkit = new SearchkitManager(elasticsearchHost);
 
 const services = new Map([
-    ['google', '/images/gdrive.png'],
+    ['gdrive', '/images/gdrive.png'],
     ['confluence', '/images/confluence.png'],
 ]);
 
