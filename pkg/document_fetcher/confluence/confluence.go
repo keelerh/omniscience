@@ -15,7 +15,6 @@ import (
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/pkg/errors"
 	"strconv"
-	"reflect"
 )
 
 const (
@@ -63,50 +62,63 @@ func NewConfluence(hostname string, auth AuthMethod, ingesterClient *pb.Ingester
 }
 
 func (c *ConfluenceService) Fetch(modifiedSince time.Time) error {
-	startIdx := 0
-	endpoint, err := c.constructEndpoint(startIdx)
-	if err != nil {
-		return err
-	}
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		return err
-	}
-
-	res, err := c.sendRequest(req)
-	if err != nil {
-		return err
-	}
-
-	var contents Contents
-	if err := json.Unmarshal(res, &contents); err != nil {
-		return err
-	}
-
 	stream, err := c.ingesterClient.Ingest(context.Background())
-	for _, r := range contents.Results {
-		t, err := time.Parse(timestampFormat, r.Version.When)
-		modifiedSince, err := ptypes.TimestampProto(t)
-		if err != nil {
-			return errors.Wrap(err, "failed to parse modified since timestamp as proto")
-		}
-		content, err := html2text.FromString(r.Body.Storage.Value)
+	if err != nil {
+		return err
+	}
+
+	startIdx := 0
+	for {
+		endpoint, err := c.constructEndpoint(startIdx)
 		if err != nil {
 			return err
 		}
-		// TODO: Only retrieve files modified after the last modified time specified in the request.
-		doc := pb.Document{
-			Id:           &pb.DocumentId{Id: r.Id},
-			Title:        r.Title,
-			Description:  "",
-			Service:      service,
-			Content:      content,
-			Url:          fmt.Sprintf("%s://%s/wiki%s", protocol, c.hostname, r.Links.WebUI),
-			LastModified: modifiedSince,
-		}
-		if err := stream.Send(&doc); err != nil {
+		req, err := http.NewRequest("GET", endpoint, nil)
+		if err != nil {
 			return err
 		}
+
+		res, err := c.sendRequest(req)
+		if err != nil {
+			return err
+		}
+
+		var contents Contents
+		if err := json.Unmarshal(res, &contents); err != nil {
+			return err
+		}
+
+		for _, r := range contents.Results {
+			t, err := time.Parse(timestampFormat, r.Version.When)
+			modifiedSince, err := ptypes.TimestampProto(t)
+			if err != nil {
+				return errors.Wrap(err, "failed to parse modified since timestamp as proto")
+			}
+			content, err := html2text.FromString(r.Body.Storage.Value)
+			if err != nil {
+				return err
+			}
+			// TODO: Only retrieve files modified after the last modified time specified in the request.
+			doc := pb.Document{
+				Id:           &pb.DocumentId{Id: r.Id},
+				Title:        r.Title,
+				Description:  "",
+				Service:      service,
+				Content:      content,
+				Url:          fmt.Sprintf("%s://%s/wiki%s", protocol, c.hostname, r.Links.WebUI),
+				LastModified: modifiedSince,
+			}
+			if err := stream.Send(&doc); err != nil {
+				return err
+			}
+		}
+
+		if len(contents.Results) == limit {
+			startIdx += limit
+		} else {
+			break
+		}
+
 	}
 
 	if _, err := stream.CloseAndRecv(); err != nil {
@@ -126,11 +138,11 @@ func (c *ConfluenceService) constructEndpoint(startIdx int) (string, error) {
 		return "", err
 	}
 	endpoint.Path = confluenceContentRetrievalPath
+
 	data := url.Values{}
-	// TODO: Defaults to returning 25 content objects per page so must implement manual pagination.
+	expand := []string{"body.storage", "version"}
 	start := strconv.FormatInt(int64(startIdx), 10)
 	limit := strconv.FormatInt(limit, 10)
-	expand := []string{"body.storage", "version"}
 	data.Set("expand", strings.Join(expand, ","))
 	data.Set("start", start)
 	data.Set("limit", limit)
