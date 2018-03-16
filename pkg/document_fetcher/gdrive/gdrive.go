@@ -1,4 +1,4 @@
-package document_fetcher
+package gdrive
 
 import (
 	"context"
@@ -10,26 +10,26 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	pb "github.com/keelerh/omniscience/protos"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2/jwt"
-	"google.golang.org/grpc"
 	"google.golang.org/api/drive/v3"
-	"github.com/pkg/errors"
 )
 
 const (
-	address                = "localhost:50051"
 	GoogleDriveWebViewLink = "https://docs.google.com/document/d/"
-	service                = "google"
+	service                = "gdrive"
 )
 
 type GoogleDriveService struct {
-	cfg *jwt.Config
+	cfg            *jwt.Config
+	ingesterClient pb.IngesterClient
 }
 
-func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
+func NewGoogleDrive(srvAccountCfg *jwt.Config, ingesterClient *pb.IngesterClient) *GoogleDriveService {
 	return &GoogleDriveService{
-		cfg: srvAccountCfg,
+		cfg:            srvAccountCfg,
+		ingesterClient: *ingesterClient,
 	}
 }
 
@@ -44,15 +44,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 		return errors.Wrap(err, "failed to instantiate new Google Drive service from config")
 	}
 
-	cc, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		return errors.Wrap(err, "failed to connect to IngestionService")
-	}
-	defer cc.Close()
-
-	client := pb.NewIngesterClient(cc)
-	stream, err := client.Ingest(context.Background())
-
+	stream, err := g.ingesterClient.Ingest(context.Background())
 	pageToken := ""
 	for {
 		q := svc.Files.List()
