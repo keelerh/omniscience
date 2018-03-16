@@ -34,12 +34,12 @@ func main() {
 	}
 	modifiedSince, err := time.Parse(time.RFC822, timestamp)
 	if err != nil {
-		log.Fatalf("unable to parse modified since timestamp: %v", err)
+		log.Fatalf("failed to parse modified since timestamp: %v", err)
 	}
 
 	cfg, err := readGoogleServiceAccountCfg()
 	if err != nil {
-		log.Fatalf("unable to read Google service account configuration: %v", err)
+		log.Fatalf("failed to read Google service account configuration: %v", err)
 	}
 
 	cc, err := grpc.Dial(address, grpc.WithInsecure())
