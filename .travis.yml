@@ -6,7 +6,7 @@ env:
 language: go
 
 go:
-  - 1.10.0
+  - "1.10"
 
 before_install:
   - go get github.com/mattn/goveralls
