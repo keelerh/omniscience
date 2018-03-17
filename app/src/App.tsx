@@ -24,8 +24,9 @@ const elasticsearchHost = 'http://localhost:9200';
 const searchkit = new SearchkitManager(elasticsearchHost);
 
 const services = new Map([
-    ['gdrive', '/images/gdrive.png'],
     ['confluence', '/images/confluence.png'],
+    ['gdrive', '/images/gdrive.png'],
+    ['github', '/images/github.svg'],
 ]);
 
 // Note: This is a very hacky way to highlight search string matches due to weird
@@ -91,8 +92,9 @@ const App: React.SFC<{}> = () => (
                             <HitsStats/>
                         </ActionBarRow>
                     </ActionBar>
+                    {/*TODO: Add pagination.*/}
                     <Hits
-                        hitsPerPage={15}
+                        hitsPerPage={25}
                         highlightFields={['title', 'description', 'content']}
                         sourceFilter={['title', 'description', 'url', 'service']}
                         itemComponent={HitItem}
