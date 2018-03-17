@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/keelerh/omniscience/badge.svg?branch=master)](https://coveralls.io/github/keelerh/omniscience?branch=master)
+
 # omniscience
 
 Search Everything
