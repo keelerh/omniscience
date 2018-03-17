@@ -39,12 +39,13 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 		return errors.Wrap(err, "failed to parse modified since timestamp as proto")
 	}
 
-	svc, err := drive.New(g.cfg.Client(context.Background()))
+	ctx := context.Background()
+	svc, err := drive.New(g.cfg.Client(ctx))
 	if err != nil {
 		return errors.Wrap(err, "failed to instantiate new Google Drive service from config")
 	}
 
-	stream, err := g.ingesterClient.Ingest(context.Background())
+	stream, err := g.ingesterClient.Ingest(ctx)
 	pageToken := ""
 	for {
 		q := svc.Files.List()

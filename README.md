@@ -1,4 +1,5 @@
 # omniscience
+
 Search Everything
 
 ## Elasticsearch
@@ -27,40 +28,29 @@ http.cors.allow-headers : X-Requested-With,X-Auth-Token,Content-Type, Content-Le
 $ elasticsearch
 ```
 
-## Google Drive
-
-### Create a Google service account
-
-1. Go to [cloud.google.com/console](http://cloud.google.com/console)
-2. Click Create Project
-3. Enter a project name and click Create
-4. Once you have created your project, click on the options menu icon in the top left corner of the page, then 'APIs & Services', then 'Credentials'
-5. Click on 'Create credentials' and then 'Service account key'
-6. Next, select 'New service account', name it anything and select 'Project' and then 'Viewer' as the role from the dropdown list, finally select JSON as the key type and click 'Create'. Upon clicking 'Create', a JSON file will be downloaded; this is important for later so remember where you downloaded it
-7. Click on 'Manage service accounts' (on the right-hand side), select your new Service Account, click on the three dots on the right-hand side, and then select Edit
-8. Tick the box "Enable GSuite Domain-wide Delegation" and click Configure consent screen
-9. Click on the options menu icon in the top left corner again, choose 'APIs & Services' and then 'Dashboard'
-10. Click on the Drive API and then click the blue Enable button
-
-### Share folders with Google service account
-
-For the Google service account to have access to index your files you must share the relevant folders with the service account's `client_email`.
-
 ## Golang backend
 
 ### Start Go server
 
-From the project root run:
+To start the omniscience server, run
 
 ```
 $ go run cmd/omniscience_server/main.go --fGoogleServiceAccountPath=<path-to-service-account-json>
 ```
 
+from the root of the project.
+
 ### Manually invoke indexing
 
+Indexing is invoked on a per service basis. To index files from a given service navigate to the service's directory in the `cmd/omniscience_client` directory and run 
+
 ```
-$ go run cmd/omniscience_client/main.go
+$ go run main.go
 ```
+
+with the relevant flags for the service. More detailed instructions for running each service can be found in the README of each service's directory.
+
+Elasticsearch and the omniscience server must be running for indexing to work.
 
 ## React app
 
