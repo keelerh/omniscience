@@ -113,11 +113,10 @@ func (c *ConfluenceService) Fetch(modifiedSince time.Time) error {
 			}
 		}
 
-		if len(contents.Results) == limit {
-			startIdx += limit
-		} else {
+		if len(contents.Results) != limit {
 			break
 		}
+		startIdx += limit
 
 	}
 
