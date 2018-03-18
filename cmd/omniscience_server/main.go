@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("failed to initialise Elasticsearch client: %v", err)
 	}
 
-	ingester, err := ingestion.NewIngester(esClient)
+	ingester := ingestion.NewIngester(esClient)
 	if err != nil {
 		log.Fatalf("failed to initialise Ingestion service: %v", err)
 	}
