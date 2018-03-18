@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/keelerh/omniscience.svg?branch=master)](https://travis-ci.org/keelerh/omniscience)
 [![Coverage Status](https://coveralls.io/repos/github/keelerh/omniscience/badge.svg?branch=master)](https://coveralls.io/github/keelerh/omniscience?branch=master)
 
 # omniscience
