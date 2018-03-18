@@ -6,9 +6,9 @@ import (
 	"io"
 
 	"github.com/golang/protobuf/ptypes"
+	"github.com/keelerh/omniscience/pkg/elasticsearch"
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/olivere/elastic"
-	"github.com/keelerh/omniscience/pkg/elasticsearch"
 )
 
 const (
@@ -67,12 +67,9 @@ func (s *Ingester) createIndexIfNotExists(ctx context.Context) error {
 	}
 	if !exists {
 		// Create a new index.
-		createIndex, err := s.elasticClient.CreateIndex(elasticsearch.Index).BodyString(elasticsearch.Mapping).Do(ctx)
+		_, err := s.elasticClient.CreateIndex(elasticsearch.Index).BodyString(elasticsearch.Mapping).Do(ctx)
 		if err != nil {
 			return err
-		}
-		if !createIndex.Acknowledged {
-			// Not acknowledged.
 		}
 	}
 
