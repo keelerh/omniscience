@@ -19,12 +19,13 @@ type Ingester struct {
 	elasticClient *elastic.Client
 }
 
-func NewIngester(esClient *elastic.Client) (*Ingester, error) {
+func NewIngester(esClient *elastic.Client) *Ingester {
 	return &Ingester{
 		elasticClient: esClient,
-	}, nil
+	}
 }
 
+// mockgen -destination=mocks/ingester_mock.go -package=ingester_mocks github.com/keelerh/omniscience/protos Ingester_IngestServer
 func (s *Ingester) Ingest(stream pb.Ingester_IngestServer) error {
 	for {
 		doc, err := stream.Recv()
