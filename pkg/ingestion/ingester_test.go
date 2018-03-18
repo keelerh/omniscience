@@ -1,6 +1,8 @@
 package ingestion_test
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,19 +13,43 @@ import (
 	"github.com/keelerh/omniscience/pkg/ingestion"
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/keelerh/omniscience/pkg/ingestion/mocks"
 )
 
-func TestIngester_Ingest(t *testing.T) {
+func TestIngester_Ingest_Success(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	stream := ingester_mocks.NewMockIngester_IngestServer(mockCtrl)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{
+			"_shards" : {
+				"total" : 2,
+				"failed" : 0,
+				"successful" : 2
+			},
+			"_index" : "omniscience",
+			"_type" : "_doc",
+			"_id" : "123",
+			"_version" : 1,
+			"_seq_no" : 0,
+			"_primary_term" : 1,
+			"result" : "created"
+		}`)
+	}))
+	defer ts.Close()
+
+	elasticClient, err := mockElasticClient(ts.URL)
+	require.NoError(t, err)
+
+	ingester := ingestion.NewIngester(elasticClient)
+
 	doc := &pb.Document{
 		Id:          &pb.DocumentId{Id: "123"},
 		Title:       "Fake document",
-		Description: "This is my fake document.",
+		Description: "",
 		Content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit," +
 			"sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
 			"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris" +
@@ -35,31 +61,57 @@ func TestIngester_Ingest(t *testing.T) {
 		Service:      "fake_service",
 		LastModified: ptypes.TimestampNow(),
 	}
+	stream := ingester_mocks.NewMockIngester_IngestServer(mockCtrl)
+	stream.EXPECT().Context().Return(context.TODO()).Times(1)
 	stream.EXPECT().Recv().Return(doc, nil).Times(1)
 	stream.EXPECT().Recv().Return(nil, io.EOF).Times(1)
 
-	ts := httptest.NewServer(mockHandler())
+	err = ingester.Ingest(stream)
+	assert.NoError(t, err)
+}
+
+func TestIngester_Ingest_StreamError(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{}`)
+	}))
 	defer ts.Close()
 
 	elasticClient, err := mockElasticClient(ts.URL)
 	require.NoError(t, err)
 
 	ingester := ingestion.NewIngester(elasticClient)
-	err = ingester.Ingest(stream)
 
-	require.NoError(t, err)
+	stream := ingester_mocks.NewMockIngester_IngestServer(mockCtrl)
+	stream.EXPECT().Recv().Return(nil, errors.New("stream failed")).Times(1)
+
+	err = ingester.Ingest(stream)
+	assert.EqualError(t, err, "stream failed")
 }
 
-func mockHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp := `{
-            "took": 73,
-            "timed_out": false,
-            "hits": [],
-            "aggregations": {}
-        }`
-		w.Write([]byte(resp))
-	}
+func TestIngester_ElasticSearchIndexExists_Fail(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(404)
+		fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	elasticClient, err := mockElasticClient(ts.URL)
+	require.NoError(t, err)
+
+	ingester := ingestion.NewIngester(elasticClient)
+
+	stream := ingester_mocks.NewMockIngester_IngestServer(mockCtrl)
+	stream.EXPECT().Context().Return(context.TODO()).Times(1)
+	stream.EXPECT().Recv().Return(nil, nil).Times(1)
+
+	err = ingester.Ingest(stream)
+	assert.Error(t, err)
 }
 
 func mockElasticClient(url string) (*elastic.Client, error) {
