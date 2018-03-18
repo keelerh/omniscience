@@ -33,7 +33,7 @@ func (s *Ingester) Ingest(stream pb.Ingester_IngestServer) error {
 			break
 		} else if err != nil {
 			return err
-		} else if err := s.index(doc); err != nil {
+		} else if err := s.index(stream.Context(), doc); err != nil {
 			return err
 		}
 	}
@@ -41,17 +41,17 @@ func (s *Ingester) Ingest(stream pb.Ingester_IngestServer) error {
 	return nil
 }
 
-func (s *Ingester) index(d *pb.Document) error {
-	if err := s.createIndexIfNotExists(context.Background()); err != nil {
+func (s *Ingester) index(ctx context.Context, d *pb.Document) error {
+	if err := s.createIndexIfNotExists(ctx); err != nil {
 		return err
 	}
 
-	if err := s.indexDocument(context.Background(), d); err != nil {
+	if err := s.indexDocument(ctx, d); err != nil {
 		return err
 	}
 
 	// Flush to make sure the documents got written.
-	_, err := s.elasticClient.Flush().Index(elasticsearch.Index).Do(context.Background())
+	_, err := s.elasticClient.Flush().Index(elasticsearch.Index).Do(ctx)
 	if err != nil {
 		return err
 	}
