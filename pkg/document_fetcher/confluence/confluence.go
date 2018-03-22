@@ -117,7 +117,6 @@ func (c *ConfluenceService) Fetch(modifiedSince time.Time) error {
 			break
 		}
 		startIdx += limit
-
 	}
 
 	if _, err := stream.CloseAndRecv(); err != nil {
