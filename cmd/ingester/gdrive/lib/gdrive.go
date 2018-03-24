@@ -1,8 +1,7 @@
-package gdrive
+package lib
 
 import (
 	"context"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -22,30 +21,29 @@ const (
 )
 
 type GoogleDriveService struct {
-	cfg            *jwt.Config
-	ingesterClient pb.IngesterClient
+	cfg *jwt.Config
 }
 
-func NewGoogleDrive(srvAccountCfg *jwt.Config, ingesterClient *pb.IngesterClient) *GoogleDriveService {
+func NewGoogleDrive(srvAccountCfg *jwt.Config) *GoogleDriveService {
 	return &GoogleDriveService{
-		cfg:            srvAccountCfg,
-		ingesterClient: *ingesterClient,
+		cfg: srvAccountCfg,
 	}
 }
 
-func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
+func (g *GoogleDriveService) Fetch(modifiedSince time.Time) ([]*pb.Document, error) {
+	var allDocuments []*pb.Document
+
 	modifiedSinceProto, err := ptypes.TimestampProto(modifiedSince)
 	if err != nil {
-		return errors.Wrap(err, "failed to parse modified since timestamp as proto")
+		return nil, errors.Wrap(err, "failed to parse modified since timestamp as proto")
 	}
 
 	ctx := context.Background()
 	svc, err := drive.New(g.cfg.Client(ctx))
 	if err != nil {
-		return errors.Wrap(err, "failed to instantiate new Google Drive service from config")
+		return nil, errors.Wrap(err, "failed to instantiate new Google Drive service from config")
 	}
 
-	stream, err := g.ingesterClient.Ingest(ctx)
 	pageToken := ""
 	for {
 		q := svc.Files.List()
@@ -55,7 +53,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 		}
 		r, err := q.Do()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		for _, f := range r.Files {
 			// TODO: Figure out how to download all formats of text files.
@@ -70,7 +68,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 				continue
 			}
 			// TODO: Only retrieve files modified after the last modified time specified in the request.
-			doc := pb.Document{
+			allDocuments = append(allDocuments, &pb.Document{
 				Id:          &pb.DocumentId{Id: f.Id},
 				Title:       f.Name,
 				Description: f.Description,
@@ -80,10 +78,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 				// TODO: This should be using the ModifiedTime of the file returned by Google.
 				// but that field currently appears to be null.
 				LastModified: modifiedSinceProto,
-			}
-			if err := stream.Send(&doc); err != nil {
-				return err
-			}
+			})
 		}
 		pageToken = r.NextPageToken
 		if pageToken == "" {
@@ -91,14 +86,7 @@ func (g *GoogleDriveService) Fetch(modifiedSince time.Time) error {
 		}
 	}
 
-	if _, err := stream.CloseAndRecv(); err != nil {
-		// We expect io.EOF once the stream has closed.
-		if err != io.EOF {
-			return err
-		}
-	}
-
-	return nil
+	return allDocuments, nil
 }
 
 func downloadFile(svc *drive.Service, fileId string, isGoogleDoc bool) (string, error) {
