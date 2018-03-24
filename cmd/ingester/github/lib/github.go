@@ -1,8 +1,7 @@
-package github
+package lib
 
 import (
 	"context"
-	"io"
 	"strconv"
 	"time"
 
@@ -20,12 +19,11 @@ const (
 )
 
 type GithubService struct {
-	client         *github.Client
-	ingesterClient pb.IngesterClient
-	organization   string
+	client       *github.Client
+	organization string
 }
 
-func NewGithub(token string, organization string, ingesterClient *pb.IngesterClient) *GithubService {
+func NewGithub(token string, organization string) *GithubService {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
@@ -33,42 +31,38 @@ func NewGithub(token string, organization string, ingesterClient *pb.IngesterCli
 	client := github.NewClient(tc)
 
 	return &GithubService{
-		client:         client,
-		ingesterClient: *ingesterClient,
-		organization:   organization,
+		client:       client,
+		organization: organization,
 	}
 }
 
-func (g *GithubService) Fetch(modifiedSince time.Time) error {
+func (g *GithubService) Fetch(modifiedSince time.Time) ([]*pb.Document, error) {
+	var allDocuments []*pb.Document
+
 	modifiedSinceProto, err := ptypes.TimestampProto(modifiedSince)
 	if err != nil {
-		return errors.Wrap(err, "failed to parse modified since timestamp as proto")
+		return nil, errors.Wrap(err, "failed to parse modified since timestamp as proto")
 	}
 
 	ctx := context.Background()
-	stream, err := g.ingesterClient.Ingest(ctx)
-	if err != nil {
-		return err
-	}
-
 	repos, err := g.getReposInOrganization(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, r := range repos {
 		owner := r.GetOwner().GetLogin()
 		readme, _, err := g.client.Repositories.GetReadme(ctx, owner, r.GetName(), nil)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		content, err := readme.GetContent()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		// Individual files do not have an ID but as we are currently only retrieving
 		// the preferred README for a repository we can instead use the repo ID.
 		id := strconv.FormatInt(r.GetID(), 10)
-		doc := pb.Document{
+		allDocuments = append(allDocuments, &pb.Document{
 			Id:           &pb.DocumentId{Id: id},
 			Title:        r.GetName() + "/" + readme.GetName(),
 			Description:  "",
@@ -76,20 +70,11 @@ func (g *GithubService) Fetch(modifiedSince time.Time) error {
 			Content:      content,
 			Url:          readme.GetHTMLURL(),
 			LastModified: modifiedSinceProto,
-		}
-		if err := stream.Send(&doc); err != nil {
-			return err
-		}
+		})
+
 	}
 
-	if _, err := stream.CloseAndRecv(); err != nil {
-		// We expect io.EOF once the stream has closed.
-		if err != io.EOF {
-			return err
-		}
-	}
-
-	return nil
+	return allDocuments, nil
 }
 
 func (g *GithubService) getReposInOrganization(ctx context.Context) ([]*github.Repository, error) {

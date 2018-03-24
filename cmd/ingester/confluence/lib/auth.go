@@ -1,4 +1,4 @@
-package confluence
+package lib
 
 import (
 	"fmt"

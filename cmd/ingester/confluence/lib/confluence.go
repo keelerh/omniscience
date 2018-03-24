@@ -1,20 +1,19 @@
-package confluence
+package lib
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"strconv"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/jaytaylor/html2text"
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 const (
@@ -46,60 +45,54 @@ type Content struct {
 }
 
 type ConfluenceService struct {
-	authMethod     AuthMethod
-	client         *http.Client
-	hostname       string
-	ingesterClient pb.IngesterClient
+	authMethod AuthMethod
+	client     *http.Client
+	hostname   string
 }
 
-func NewConfluence(hostname string, auth AuthMethod, ingesterClient *pb.IngesterClient) (*ConfluenceService, error) {
+func NewConfluence(hostname string, auth AuthMethod) (*ConfluenceService, error) {
 	return &ConfluenceService{
-		authMethod:     auth,
-		client:         &http.Client{},
-		hostname:       hostname,
-		ingesterClient: *ingesterClient,
+		authMethod: auth,
+		client:     &http.Client{},
+		hostname:   hostname,
 	}, nil
 }
 
-func (c *ConfluenceService) Fetch(modifiedSince time.Time) error {
-	stream, err := c.ingesterClient.Ingest(context.Background())
-	if err != nil {
-		return err
-	}
-
+func (c *ConfluenceService) Fetch(modifiedSince time.Time) ([]*pb.Document, error) {
+	var allDocuments []*pb.Document
 	startIdx := 0
 	for {
 		endpoint, err := c.constructEndpoint(startIdx)
 		if err != nil {
-			return err
+			return allDocuments, err
 		}
 		req, err := http.NewRequest("GET", endpoint, nil)
 		if err != nil {
-			return err
+			return allDocuments, err
 		}
 
 		res, err := c.sendRequest(req)
 		if err != nil {
-			return err
+			return allDocuments, err
 		}
 
 		var contents Contents
 		if err := json.Unmarshal(res, &contents); err != nil {
-			return err
+			return allDocuments, err
 		}
 
 		for _, r := range contents.Results {
 			t, err := time.Parse(timestampFormat, r.Version.When)
 			modifiedSince, err := ptypes.TimestampProto(t)
 			if err != nil {
-				return errors.Wrap(err, "failed to parse modified since timestamp as proto")
+				return allDocuments, errors.Wrap(err, "failed to parse modified since timestamp as proto")
 			}
 			content, err := html2text.FromString(r.Body.Storage.Value)
 			if err != nil {
-				return err
+				return allDocuments, err
 			}
 			// TODO: Only retrieve files modified after the last modified time specified in the request.
-			doc := pb.Document{
+			allDocuments = append(allDocuments, &pb.Document{
 				Id:           &pb.DocumentId{Id: r.Id},
 				Title:        r.Title,
 				Description:  "",
@@ -107,10 +100,8 @@ func (c *ConfluenceService) Fetch(modifiedSince time.Time) error {
 				Content:      content,
 				Url:          fmt.Sprintf("%s://%s/wiki%s", protocol, c.hostname, r.Links.WebUI),
 				LastModified: modifiedSince,
-			}
-			if err := stream.Send(&doc); err != nil {
-				return err
-			}
+			})
+
 		}
 
 		if len(contents.Results) != limit {
@@ -119,14 +110,7 @@ func (c *ConfluenceService) Fetch(modifiedSince time.Time) error {
 		startIdx += limit
 	}
 
-	if _, err := stream.CloseAndRecv(); err != nil {
-		// We expect io.EOF once the stream has closed.
-		if err != io.EOF {
-			return err
-		}
-	}
-
-	return nil
+	return allDocuments, nil
 }
 
 func (c *ConfluenceService) constructEndpoint(startIdx int) (string, error) {
