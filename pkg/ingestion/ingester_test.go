@@ -11,12 +11,12 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/keelerh/omniscience/pkg/ingestion"
+	"github.com/keelerh/omniscience/pkg/ingestion/mocks"
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/keelerh/omniscience/pkg/ingestion/mocks"
 )
 
 func TestIngester_Ingest_Success(t *testing.T) {

@@ -11,8 +11,8 @@ import (
 	pb "github.com/keelerh/omniscience/protos"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/jwt"
-	"google.golang.org/grpc"
 	"google.golang.org/api/drive/v3"
+	"google.golang.org/grpc"
 )
 
 const (
