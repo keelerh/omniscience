@@ -8,8 +8,8 @@ import (
 
 	"github.com/keelerh/omniscience/pkg/ingestion"
 	pb "github.com/keelerh/omniscience/protos"
-	"google.golang.org/grpc"
 	"github.com/olivere/elastic"
+	"google.golang.org/grpc"
 )
 
 const (
