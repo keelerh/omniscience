@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/keelerh/omniscience.svg?branch=master)](https://travis-ci.org/keelerh/omniscience)
 [![Coverage Status](https://coveralls.io/repos/github/keelerh/omniscience/badge.svg?branch=master)](https://coveralls.io/github/keelerh/omniscience?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/keelerh/omniscience)](https://goreportcard.com/report/github.com/keelerh/omniscience)
 
 # omniscience
 
