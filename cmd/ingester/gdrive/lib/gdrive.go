@@ -106,6 +106,9 @@ func downloadFile(svc *drive.Service, fileId string, isGoogleDoc bool) (string, 
 		return "", err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
 	content := standardizeSpaces(string(body))
 
 	return content, nil
