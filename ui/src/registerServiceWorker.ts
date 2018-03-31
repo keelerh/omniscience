@@ -1,7 +1,7 @@
 // tslint:disable:no-console
 // In production, we register a service worker to serve assets from local cache.
 
-// This lets the app load faster on subsequent visits in production, and gives
+// This lets the ui load faster on subsequent visits in production, and gives
 // it offline capabilities. However, it also means that developers (and users)
 // will only see deployed updates on the 'N+1' visit to a page, since previously
 // cached resources are updated in the background.
@@ -60,7 +60,7 @@ function registerValidSW(swUrl: string) {
                 // At this point, the old content will have been purged and
                 // the fresh content will have been added to the cache.
                 // It's the perfect time to display a 'New content is
-                // available; please refresh.' message in your web app.
+                // available; please refresh.' message in your web ui.
                 console.log('New content is available; please refresh.');
               } else {
                 // At this point, everything has been precached.
@@ -87,7 +87,7 @@ function checkValidServiceWorker(swUrl: string) {
         response.status === 404 ||
         response.headers.get('content-type')!.indexOf('javascript') === -1
       ) {
-        // No service worker found. Probably a different app. Reload the page.
+        // No service worker found. Probably a different ui. Reload the page.
         navigator.serviceWorker.ready.then(registration => {
           registration.unregister().then(() => {
             window.location.reload();
