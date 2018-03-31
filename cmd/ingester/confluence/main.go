@@ -2,18 +2,12 @@ package main
 
 import (
 	"flag"
-
 	"io/ioutil"
 	"strings"
 
 	"github.com/keelerh/omniscience/cmd/ingester/common"
 	"github.com/keelerh/omniscience/cmd/ingester/confluence/lib"
 	"github.com/pkg/errors"
-)
-
-const (
-	address                       = "localhost:50051"
-	defaultModifiedSinceTimestamp = "02 Jan 06 15:04 MST"
 )
 
 var (
