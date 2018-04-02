@@ -3,6 +3,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net"
 
@@ -12,9 +13,15 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	port = ":50051"
+var (
+	fElasticsearchUrl = flag.String(
+		"elasticsearch_url",
+		"http://elasticsearch:9200",
+		"Defines the URL endpoint of the Elasticsearch node")
 )
+
+// TODO: Port should be set as an ENV variable.
+const port = ":50051"
 
 func main() {
 	lis, err := net.Listen("tcp", port)
@@ -23,8 +30,9 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	// Obtain a client and connect to the default Elasticsearch installation on 127.0.0.1:9200.
-	esClient, err := elastic.NewClient()
+	// Obtain a client and connect to the Elasticsearch installation at the URL endpoint.
+	opts := elastic.SetURL(*fElasticsearchUrl)
+	esClient, err := elastic.NewClient(opts)
 	if err != nil {
 		log.Fatalf("failed to initialise Elasticsearch client: %v", err)
 	}
