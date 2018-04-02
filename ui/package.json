@@ -15,6 +15,9 @@
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
+  "optionalDependencies": {
+    "fsevents": "*"
+  },
   "devDependencies": {
     "@types/jest": "^22.1.4",
     "@types/node": "^9.4.6",
