@@ -1,34 +1,47 @@
-# .travis.yml
+sudo: required
+
+services:
+  - docker
+
 env:
   global:
-    secure: "i9TsESPUaytcKK4NYOtKgQuiKwvwyRKRqnCWJ9GUBmN7nnk6LeOeD63qFDhF3Kyap9Vkml2Ky6Dzg1enWYOsvCs+8Mb+0ZGbUGGn86cGSYQauOscH3BzMZBLKYon7LzPY183ucoT83E4gHxlnzpf43B+UvwLsnWUf6h8FRhknuk+Ff6AgEDct1bDGNwJITWCnS75Q4q6Wl3GtTusZtFe2oHhgcYpsWa6u7/b8PfAoCsxu5FeYbaRUWmUYAFqSuTJfUvVnGRGraNGaWosIV6yeYpJMco4kkdZH46ReAU1aGRTobrYEpiA2kzmhVDuWHiK+75sItHeQMHENGztfxaPGPT61L6t2r51MXJBKzCq9Xe2Er5/fK7vgL6fzBCLrY2A3ICIxwmMJgRUEl7k+0ED9ezdUMgWfGU/LQZ1XWgpYB+DKC1ZJ+19NoswBJAWe3SUVvkSV+I+NYoMVGPwR73qIDglUXwyR7Ol4uRlQrIBGH+xjK4RdSQbZIPGM+fK9unJgD1k3SWD1QQSc0/BXY52KN/VkJpsUL0uV2YoYv/uvxh5OHZP+9PVfz6+7jxUUJw4iha0rMNb+R4kqpR9yjSOYvEP58ctSGtaDWkIiAI7wpS2oib2eTxhQe1Vtfdq/aLCfhThZYzflWWkueFxFNnRQ27dMCPLz9NfByQUfcxz1Ec="
+    - secure: "i9TsESPUaytcKK4NYOtKgQuiKwvwyRKRqnCWJ9GUBmN7nnk6LeOeD63qFDhF3Kyap9Vkml2Ky6Dzg1enWYOsvCs+8Mb+0ZGbUGGn86cGSYQauOscH3BzMZBLKYon7LzPY183ucoT83E4gHxlnzpf43B+UvwLsnWUf6h8FRhknuk+Ff6AgEDct1bDGNwJITWCnS75Q4q6Wl3GtTusZtFe2oHhgcYpsWa6u7/b8PfAoCsxu5FeYbaRUWmUYAFqSuTJfUvVnGRGraNGaWosIV6yeYpJMco4kkdZH46ReAU1aGRTobrYEpiA2kzmhVDuWHiK+75sItHeQMHENGztfxaPGPT61L6t2r51MXJBKzCq9Xe2Er5/fK7vgL6fzBCLrY2A3ICIxwmMJgRUEl7k+0ED9ezdUMgWfGU/LQZ1XWgpYB+DKC1ZJ+19NoswBJAWe3SUVvkSV+I+NYoMVGPwR73qIDglUXwyR7Ol4uRlQrIBGH+xjK4RdSQbZIPGM+fK9unJgD1k3SWD1QQSc0/BXY52KN/VkJpsUL0uV2YoYv/uvxh5OHZP+9PVfz6+7jxUUJw4iha0rMNb+R4kqpR9yjSOYvEP58ctSGtaDWkIiAI7wpS2oib2eTxhQe1Vtfdq/aLCfhThZYzflWWkueFxFNnRQ27dMCPLz9NfByQUfcxz1Ec="
+    - secure: "lhgrjdfq/PbYx6xguYXTE1u8fx/UGi56sR4oE5lJPTeViBNsaiQFpwoUlMQS5IlRHWX6ilH1l4XIh6Glp23iycSX73W1AJqzJa9UKEFm4D6tW2R3UWP6fOprekQ7Hl+Sy/uNoKGEA5d7u+U+/cxJ0rhlai2FiBEulr6PaoWcnbivW53bwlRjewIVmITjYzDhAapn4Gl7Ki3rScslJ/aDyPJHd4/N4xAWJ99Y4kDSSFSmdo+EWoeXOb1v6lStB6ULxl/xcGGNsbqP08E3k3tER25lYFnyx7qFA3az338sFrlVU0uGnwU8sgyeLkg1WZM7tqYutGc+5hPqG0Ko4yrrY08rpKOdcLfQVC9L94YdgTwaSwaA2TGN7O78RbCQfX8QWhAnKn2xpVa8zuuh4262oJh43HZFWFoR+afW/9NNaFksHDtfVWw1K+IhzgAnGHPXxbJzGYalcUCT2BsriUSHmP5qsgbMfoOAUfVvQAt6d6Dal9Mz0LlOOe/Twa8FZapcpsq77vIrLhlFUNEZUzd/LjFNy9VlvMjw6lWQfNAg3Zfuty0bd5vmEgj6lVnv83VGB6R+fPeLfTrBbMIWMfM/IUZVsAJ1AMGy8oQynjCAsuGO5P0jSycN3Fyy69PmGL0C7wph4xkEAPlrAgAxfy1KFTVxzcZ1RmVxMtZ1iDXVbwY=" # DOCKER_USER
+    - secure: "JevDYrp+pskYhXBoXGwbrMQd398DTswwEsxj+4GEPt9yE9ppi1ey8USjr3/VdmrhkzaEuyuH7wLsqD8TYog+F8n6ALbkQUXiOQZcZL7J7f+fRS1Ox79xyfH97ABOsUQXvKhwGSYBaSv5UIVqrwrkOIvUu4nsUKhw0cP0SBFuNAka5iSk5wOHw8uQXM/WGqbt0BULijH4cEtVt0kyTgzj4xaGvrom+vmvy6UuKo0LR+vRXWHV+ApE9Oib5a9aduAWJuGF/glEUZF7x5atT8jjO7C/B7EhlqV4/+lo9x0JAINPWJ01JSJmeBqn4xg0HayPcLhJ2jiipEgMNeB+2nNsjYaSMZlBQy8fZ5q5MHXTeGwLY24J6kkYT54y+zFfw+R6fGFd1AJn30s1cT/pCnyDoog9IAAAticnJgQIrbk2JXbM4RD234/zeOPKGvGto86781sFcJDxI9zZ1m+6/b96lgAgXnNEW/MzgQ3vv4zr2HZAnSuBGVESJhocdmfMs+3n1Aq3b8KCI/3yc/mysht1QULN9CLB+atzKMnWnlzfWWrZedBusL2VTbPruPnSLTQ55YIaff/4VcIu+oirUGfZS+S+Eu5qvMzI7CrXcS1BXYcwWB906zFyK2O6/q9163agHwPUPZhTpBPdMwxSmSQfnq0FWH5B09nxGeDr06khwms=" # DOCKER_PASS
+    - DOCKER_COMPOSE_VERSION=1.20.1
+    - COMMIT=${TRAVIS_COMMIT::8}
+    - API_REPO=keelerh/omniscience-api
+    - UI_REPO=keelerh/omniscience-ui
 
 language: go
 
 go:
   - "1.10"
 
-before_install:
+install:
+  # Coveralls
   - go get github.com/mattn/goveralls
+
+  # dep
   - curl -L -s https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep
   - chmod +x $GOPATH/bin/dep
 
-install:
-  - dep ensure
-
 script:
   - $HOME/gopath/bin/goveralls -v -service=travis-ci
-
-services:
-  - docker
+  - dep ensure
 
 after_success:
-  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
-#  - mkdir -p dist
-#  - CGO_ENABLED="0" GOARCH="amd64" GOOS="linux" go build -a -installsuffix cgo -o ./dist/gomotics
-#  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-#  - export REPO=$DOCKER_USER/gomotics
-#  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
-#  - echo $REPO:$TAG
-#  - docker build -f Dockerfile -t $REPO:$TAG .
-#  - docker push $REPO
+  - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+
+  # Build Ingestion service image
+  - docker build -t $API_REPO:$COMMIT .
+  - docker tag $API_REPO:$COMMIT $API_REPO:$TAG
+  - docker tag $API_REPO:$COMMIT $API_REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $API_REPO
+
+  # Build React frontend image
+  - docker build -t $UI_REPO:$COMMIT ./ui
+  - docker tag $UI_REPO:$COMMIT $UI_REPO:$TAG
+  - docker tag $UI_REPO:$COMMIT $UI_REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $UI_REPO

@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  api: # Go Ingestion service
+    container_name: om-api
+    build: .
+    ports:
+      - "50051:50051" # Expose API port
+    environment: # Set ENV vars
+      - ES_HOST=elasticsearch
+      - PORT=50051
+    depends_on:
+      - elasticsearch
+    command: dockerize -wait http://elasticsearch:9200 -timeout 30s ./api
+
+  ui: # React frontend
+    # TODO: Enable hot reloading.
+    container_name: om-ui
+    build: ./ui
+    ports:
+      - "3000:3000" # Expose Node dev port
+    environment: # Set ENV vars
+      - NODE_ENV=local
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    container_name: om-es
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.3
+    ports:
+      - "9200:9200"
+    environment:
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - http.cors.allow-methods=OPTIONS, HEAD, GET, POST, PUT, DELETE
+      - http.cors.allow-headers=X-Requested-With, X-Auth-Token, Content-Type, Content-Length
+    volumes:
+      - "/tmp/esdata:/usr/share/elasticsearch/data"

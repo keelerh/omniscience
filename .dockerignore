@@ -1,0 +1,8 @@
+.dockerignore
+.gitignore
+README.md
+
+node_modules/
+build/
+public/
+npm-debug.log

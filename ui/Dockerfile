@@ -1,9 +1,12 @@
-FROM node:alpine AS build-react
-ENV D=/go/src/github.com/keelerh/omniscience
-# WORKDIR $D/ui
-RUN mkdir -p /src/ui
-ADD ./ui/package.json /src/ui/
-ADD ./ui /src/ui
-RUN cd /src/ui && npm install
-COPY . .
-CMD [ "npm", "start" ]
+# 1) BUILD REACT FRONTEND
+FROM node:9.10.0-alpine
+RUN apk --no-cache add ca-certificates
+
+COPY package.json package.json
+RUN npm install
+
+COPY . /app/ui
+WORKDIR /app/ui
+
+EXPOSE 3000
+ENTRYPOINT ["npm", "start"]
