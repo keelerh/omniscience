@@ -10,7 +10,8 @@ env:
     - secure: "JevDYrp+pskYhXBoXGwbrMQd398DTswwEsxj+4GEPt9yE9ppi1ey8USjr3/VdmrhkzaEuyuH7wLsqD8TYog+F8n6ALbkQUXiOQZcZL7J7f+fRS1Ox79xyfH97ABOsUQXvKhwGSYBaSv5UIVqrwrkOIvUu4nsUKhw0cP0SBFuNAka5iSk5wOHw8uQXM/WGqbt0BULijH4cEtVt0kyTgzj4xaGvrom+vmvy6UuKo0LR+vRXWHV+ApE9Oib5a9aduAWJuGF/glEUZF7x5atT8jjO7C/B7EhlqV4/+lo9x0JAINPWJ01JSJmeBqn4xg0HayPcLhJ2jiipEgMNeB+2nNsjYaSMZlBQy8fZ5q5MHXTeGwLY24J6kkYT54y+zFfw+R6fGFd1AJn30s1cT/pCnyDoog9IAAAticnJgQIrbk2JXbM4RD234/zeOPKGvGto86781sFcJDxI9zZ1m+6/b96lgAgXnNEW/MzgQ3vv4zr2HZAnSuBGVESJhocdmfMs+3n1Aq3b8KCI/3yc/mysht1QULN9CLB+atzKMnWnlzfWWrZedBusL2VTbPruPnSLTQ55YIaff/4VcIu+oirUGfZS+S+Eu5qvMzI7CrXcS1BXYcwWB906zFyK2O6/q9163agHwPUPZhTpBPdMwxSmSQfnq0FWH5B09nxGeDr06khwms=" # DOCKER_PASS
     - DOCKER_COMPOSE_VERSION=1.20.1
     - COMMIT=${TRAVIS_COMMIT::8}
-    - REPO=keelerh/omniscience
+    - API_REPO=keelerh/omniscience-api
+    - UI_REPO=keelerh/omniscience-ui
 
 language: go
 
@@ -34,13 +35,13 @@ after_success:
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
 
   # Build Ingestion service image
-  - docker build -t $REPO:api/$COMMIT .
-  - docker tag $REPO:$COMMIT $REPO:api/$TAG
-  - docker tag $REPO:$COMMIT $REPO:api/travis-$TRAVIS_BUILD_NUMBER
+  - docker build -t $API_REPO:$COMMIT .
+  - docker tag $API_REPO:$COMMIT $API_REPO:$TAG
+  - docker tag $API_REPO:$COMMIT $API_REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $API_REPO
 
   # Build React frontend image
-  - docker build -t $REPO:ui/$COMMIT ./ui
-  - docker tag $REPO:$COMMIT $REPO:ui/$TAG
-  - docker tag $REPO:$COMMIT $REPO:ui/travis-$TRAVIS_BUILD_NUMBER
-
-  - docker push $REPO
+  - docker build -t $UI_REPO:$COMMIT ./ui
+  - docker tag $UI_REPO:$COMMIT $UI_REPO:$TAG
+  - docker tag $UI_REPO:$COMMIT $UI_REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $UI_REPO

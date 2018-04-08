@@ -32,3 +32,4 @@ COPY --from=build-go /tmp/api /app/server/
 COPY --from=install-dockerize /usr/local/bin/dockerize /usr/local/bin/dockerize
 
 EXPOSE 50051
+ENTRYPOINT ["dockerize", "-wait", "http://elasticsearch:9200", "-timeout", "30s", "./api"]
