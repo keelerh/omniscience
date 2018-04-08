@@ -2,9 +2,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/keelerh/omniscience/badge.svg?branch=master)](https://coveralls.io/github/keelerh/omniscience?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/keelerh/omniscience)](https://goreportcard.com/report/github.com/keelerh/omniscience)
 
-# omniscience
+<div align="center">
+  <img src="images/logo.png" width="200" height="150">
+</div>
 
-Search Everything
+Omniscience is a search utility for searching over private documents aggregated from a collection of sources.
 
 ## Elasticsearch
 
