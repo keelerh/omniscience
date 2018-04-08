@@ -8,6 +8,27 @@
 
 Omniscience is a search utility for searching over private documents aggregated from a collection of sources.
 
+```
++----------+
+|Google    |
+|Drive     | --+
+|Service   |   |
++----------+   |
+               |
++----------+   |    +----------+     +----------+     +----------+                       
+|GitHub    |   |    |Ingestion |     |DB        |     |Frontend  |                   
+|Service   | --+--> |Service   | --> |          | --> |          |
+|          |   |    |          |     |          |     |          |
++----------+   |    +----------+     +----------+     +----------+
+               |
++----------+   |
+|Confluence|   |
+|Service   | --+
+|          |
++----------+
+```
+
+
 ## Elasticsearch
 
 ### Install
@@ -79,3 +100,6 @@ $ cd client && npm start
 ## Search everything!
 
 Navigate to [http://localhost:3000](http://localhost:3000)
+
+## License
+This project is licensed under the MIT License - see the LICENSE.md file for details
