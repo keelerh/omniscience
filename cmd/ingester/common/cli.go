@@ -24,6 +24,8 @@ var (
 )
 
 func CreateIngesterCLI(fetcherFactory DocumentFetcherFactory) {
+	flag.Parse()
+	
 	// TODO(ains): more sensible ctx?
 	ctx := context.Background()
 
