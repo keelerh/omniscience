@@ -49,7 +49,6 @@ func (g *GithubService) Fetch(modifiedSince time.Time) ([]*pb.Document, error) {
 		return nil, err
 	}
 	for _, r := range repos {
-		println(r.GetID())
 		owner := r.GetOwner().GetLogin()
 		readme, _, err := g.client.Repositories.GetReadme(ctx, owner, r.GetName(), nil)
 		if err != nil {
