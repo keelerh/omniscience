@@ -24,7 +24,7 @@ func main() {
 	s := grpc.NewServer()
 
 	// Obtain a client and connect to the default Elasticsearch installation on 127.0.0.1:9200.
-	esClient, err := elastic.NewClient()
+	esClient, err := elastic.NewClient(elastic.SetURL("http://elasticsearch:9200"))
 	if err != nil {
 		log.Fatalf("failed to initialise Elasticsearch client: %v", err)
 	}
