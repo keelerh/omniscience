@@ -6,7 +6,7 @@ package omniscience
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/empty"
+import empty "github.com/golang/protobuf/ptypes/empty"
 
 import (
 	context "golang.org/x/net/context"
@@ -18,6 +18,12 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConn
@@ -26,8 +32,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for Ingester service
-
+// IngesterClient is the client API for Ingester service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type IngesterClient interface {
 	// Ingests documents and indexes and uploads them to persistant storage.
 	Ingest(ctx context.Context, opts ...grpc.CallOption) (Ingester_IngestClient, error)
@@ -42,7 +49,7 @@ func NewIngesterClient(cc *grpc.ClientConn) IngesterClient {
 }
 
 func (c *ingesterClient) Ingest(ctx context.Context, opts ...grpc.CallOption) (Ingester_IngestClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Ingester_serviceDesc.Streams[0], c.cc, "/omniscience.Ingester/Ingest", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Ingester_serviceDesc.Streams[0], "/omniscience.Ingester/Ingest", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +59,7 @@ func (c *ingesterClient) Ingest(ctx context.Context, opts ...grpc.CallOption) (I
 
 type Ingester_IngestClient interface {
 	Send(*Document) error
-	CloseAndRecv() (*google_protobuf1.Empty, error)
+	CloseAndRecv() (*empty.Empty, error)
 	grpc.ClientStream
 }
 
@@ -64,19 +71,18 @@ func (x *ingesterIngestClient) Send(m *Document) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *ingesterIngestClient) CloseAndRecv() (*google_protobuf1.Empty, error) {
+func (x *ingesterIngestClient) CloseAndRecv() (*empty.Empty, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
-	m := new(google_protobuf1.Empty)
+	m := new(empty.Empty)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// Server API for Ingester service
-
+// IngesterServer is the server API for Ingester service.
 type IngesterServer interface {
 	// Ingests documents and indexes and uploads them to persistant storage.
 	Ingest(Ingester_IngestServer) error
@@ -91,7 +97,7 @@ func _Ingester_Ingest_Handler(srv interface{}, stream grpc.ServerStream) error {
 }
 
 type Ingester_IngestServer interface {
-	SendAndClose(*google_protobuf1.Empty) error
+	SendAndClose(*empty.Empty) error
 	Recv() (*Document, error)
 	grpc.ServerStream
 }
@@ -100,7 +106,7 @@ type ingesterIngestServer struct {
 	grpc.ServerStream
 }
 
-func (x *ingesterIngestServer) SendAndClose(m *google_protobuf1.Empty) error {
+func (x *ingesterIngestServer) SendAndClose(m *empty.Empty) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -126,9 +132,9 @@ var _Ingester_serviceDesc = grpc.ServiceDesc{
 	Metadata: "ingester.proto",
 }
 
-func init() { proto.RegisterFile("ingester.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("ingester.proto", fileDescriptor_ingester_0b1b112079b44562) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor_ingester_0b1b112079b44562 = []byte{
 	// 130 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xcb, 0xcc, 0x4b, 0x4f,
 	0x2d, 0x2e, 0x49, 0x2d, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xce, 0xcf, 0xcd, 0xcb,
