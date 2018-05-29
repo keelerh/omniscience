@@ -14,7 +14,6 @@ import (
 
 const (
 	reposToListPerPage = 25 // Maximum number of Github repos to return per page.
-	teamsToListPerPage = 25 // Maximum number of Github teams to return per page.
 	service            = "github"
 )
 
@@ -78,55 +77,17 @@ func (g *GithubService) Fetch(modifiedSince time.Time) ([]*pb.Document, error) {
 }
 
 func (g *GithubService) getReposInOrganization(ctx context.Context) ([]*github.Repository, error) {
-	teams, err := g.getTeamsInOrganization(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var repos []*github.Repository
-	for _, t := range teams {
-		rs, err := g.getReposInTeam(ctx, *t.ID)
-		if err != nil {
-			return nil, err
-		}
-		repos = append(repos, rs...)
+	listOpts := &github.RepositoryListByOrgOptions{
+		ListOptions: github.ListOptions{
+			PerPage: reposToListPerPage,
+		},
 	}
 
-	return repos, nil
-}
-
-func (g *GithubService) getTeamsInOrganization(ctx context.Context) ([]*github.Team, error) {
-	var teams []*github.Team
-	listOpts := &github.ListOptions{
-		PerPage: teamsToListPerPage,
-	}
 	pageIdx := 0
 	for {
-		listOpts.Page = pageIdx
-		ts, _, err := g.client.Organizations.ListTeams(ctx, g.organization, listOpts)
-		if err != nil {
-			return nil, err
-		}
-		teams = append(teams, ts...)
-		if len(ts) == teamsToListPerPage {
-			pageIdx += teamsToListPerPage
-		} else {
-			break
-		}
-	}
-
-	return teams, nil
-}
-
-func (g *GithubService) getReposInTeam(ctx context.Context, teamId int64) ([]*github.Repository, error) {
-	var repos []*github.Repository
-	listOpts := &github.ListOptions{
-		PerPage: reposToListPerPage,
-	}
-	pageIdx := 0
-	for {
-		listOpts.Page = pageIdx
-		rs, _, err := g.client.Organizations.ListTeamRepos(ctx, teamId, listOpts)
+		listOpts.ListOptions.PerPage = pageIdx
+		rs, _, err := g.client.Repositories.ListByOrg(ctx, g.organization, listOpts)
 		if err != nil {
 			return nil, err
 		}
