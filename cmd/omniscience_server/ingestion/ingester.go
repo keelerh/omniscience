@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/keelerh/omniscience/pkg/elasticsearch"
+	"github.com/keelerh/omniscience/cmd/omniscience_server/elasticsearch"
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/olivere/elastic"
 )
