@@ -1,4 +1,4 @@
-package ingestion_test
+package ingestion
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/keelerh/omniscience/pkg/ingestion"
-	"github.com/keelerh/omniscience/pkg/ingestion/mocks"
+	"github.com/keelerh/omniscience/cmd/omniscience_server/ingestionce_server/ingestion"
+	"github.com/keelerh/omniscience/cmd/omniscience_server/ingestionce_server/ingestion/mocks"
 	pb "github.com/keelerh/omniscience/protos"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
